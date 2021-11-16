@@ -1,0 +1,183 @@
+---
+title: "GT Package"
+output:
+   html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    toc_depth: 3
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r  cache=FALSE}
+library(tidyverse)
+library(gt)
+
+martians <- read_tsv("../data/martians.txt")
+```
+
+# Demo 
+
+```{r}
+martians
+```
+## Inserting the Martians data set using gt package:
+I have added a date column for one of the next exercises.
+```{r}
+martians %>% 
+  gt()
+
+```
+## Grouping 
+Here we have grouped the data by the sites
+```{r}
+tab <- martians %>% 
+  gt(
+    groupname_col = "Site",
+    rowname_col = "Nose"
+  )
+tab
+```
+
+## Formating the Variables 
+
+Here we have changed the speed decimals having some scientific notation looks 
+```{r}
+tab_2 <- tab %>% 
+  fmt_scientific(
+    columns = c(Speed.Mars, Speed.Earth),
+    decimals = 1
+  )
+tab_2
+```
+
+## Hiding Columns 
+
+Hiding the columns would not affect any computations on the hidden columns, they are still usable. 
+
+```{r}
+tab_3 <- tab_2 %>% 
+  cols_hide(
+    columns = c(EyeIndex, Eye, Ratio, Age, Aptitude, BMI, Group, AgeIndex, Height_UnequalVar, Height_UnequalVar8)
+  )
+tab_3
+```
+## Footnote 
+### Footnote on a cell
+
+```{r}
+tab_4 <- 
+  tab_3 %>% 
+  tab_footnote(
+    footnote = "These are shortest martians.",
+    locations = cells_body(
+      columns = Height,
+      rows = Height < 200
+    )
+  )
+tab_4
+# # info_date_style()
+# info_paletteer()
+```
+
+
+```{r}
+tab_5 <- 
+  tab_4 %>% 
+  tab_footnote(
+    footnote = "All values are in m/s",
+    locations = cells_column_labels(
+      columns = c(Speed.Mars, Speed.Earth)
+    )
+  )
+tab_5
+```
+You don't need to worry about the order. GT package keep the order according to the first footnote execution.
+
+```{r}
+
+tab_6<-
+  tab_5 %>% 
+  tab_options(
+    footnotes.marks  = "letters"
+  )
+tab_6
+```
+
+## Sources Note:
+```{r}
+tab_7<- 
+tab_6 %>% tab_source_note(
+  source_note = "Source: data folder in https://github.com/Scavetta/Misk-DSI-2021-01" 
+)
+tab_7
+```
+
+
+## Renameing/ Adding a Header 
+
+adding a header and a subtitle to the table.
+Also, when you want to use **bold** or *italic* use function `md()`.
+
+```{r}
+tab_8 <-
+  tab_7 %>% 
+  cols_label(
+    Speed.Earth = "Speed in Earth",
+    Speed.Mars = "Speed in Mars"
+
+  ) %>% 
+  tab_header(
+    title = "The Martians Example",
+    subtitle = md("Uses the *martians* data set provided by the **doctor**")
+  )
+tab_8
+```
+
+
+
+## Column Width 
+
+```{r}
+
+tab_9<-
+  tab_8 %>%
+  cols_width(everything() ~ px(100))
+ tab_9
+```
+## Colors 
+
+```{r}
+
+  tab_9 %>% 
+  data_color(
+    columns = Antennae,
+    colors = c("blue", "red")
+  )
+```
+```{r}
+
+  tab_9 %>% 
+  tab_options(
+    stub.background.color = "blue"
+  )
+```
+
+```{r}
+# # tab_10<-
+#   tab_9 %>%
+#   data_color(
+#     columns = vars(Height),
+#     colors = scales::col_numeric(
+#       palette = c("white", "#104e8b"),
+#       domian = NULL    )
+#   )
+```
+
